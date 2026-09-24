@@ -1,6 +1,7 @@
 /* Create an array named products which you will use to add all of your product object literals that you create in the next step. */
 
 let products = [];
+let totalPaid = 0;
 
 /* Create 3 or more product objects using object literal notation 
    Each product should include five properties
@@ -15,19 +16,19 @@ let product1 = {
   price: 1.99, 
   quantity: 0, 
   productId: 1, 
-  image: "/images/cherry.jpg"};
+  image: "./images/cherry.jpg"};
 let product2 = {
   name: "Orange", 
   price: 2.99, 
   quantity: 0, 
   productId: 2, 
-  image: "/images/orange.jpg"};
+  image: "./images/orange.jpg"};
 let product3 = {
   name: "Strawberry", 
   price: 3.99, 
   quantity: 0, 
   productId: 3, 
-  image: "/images/strawberry.jpg"};
+  image: "./images/strawberry.jpg"};
 
   products.push(product1);
   products.push(product2);
@@ -50,19 +51,13 @@ let cart = [];
 */
 function addProductToCart(productId) {
 
-    let product = products.find(function(item) {
-      return item.productId === productId;
-    });
+    let product = getProductById(productId)
 
-    let cartItem = cart.find(function(item) {
-      return item.productId === productId;
-    });
+    let cartItem = getCartItem(productId);
 
     if (cartItem === undefined) {
         cart.push(product);
-        cartItem = cart.find(function(item) {
-          return item.productId === productId;
-        });
+        cartItem = getCartItem(productId);
     }
 
     cartItem.quantity += 1;
@@ -75,9 +70,7 @@ function addProductToCart(productId) {
 */
 function increaseQuantity(productId) {
 
-    let cartItem = cart.find(function(item) {
-      return item.productId === productId;
-    });
+    let cartItem = getCartItem(productId);
       if (cartItem !== undefined) {
           cartItem.quantity += 1;
         }
@@ -91,9 +84,7 @@ function increaseQuantity(productId) {
 */
 function decreaseQuantity(productId) {
 
-    let cartItem = cart.find(function(item) {
-      return item.productId === productId;
-    });
+    let cartItem = getCartItem(productId);
 
       if (cartItem !== undefined) {
                   
@@ -115,18 +106,20 @@ function decreaseQuantity(productId) {
 */
 
 function removeProductFromCart(productId) {
-    let position = cart.findIndex(function(item) {
-      return item.productId === productId;
-    });
-  let cartItem = cart.find(function(item) {
-      return item.productId === productId;
-    });
-      if (cartItem !== undefined) {
-          cartItem.quantity = 0;
-          cart.splice(position , 1);
-        }
-    return cartItem;
-  };
+
+  let position = cart.findIndex(function(item) {
+    return item.productId === productId;
+  });
+
+  let cartItem = getProductById(productId);
+
+  if (cartItem !== undefined && position !== -1) {
+    cartItem.quantity = 0;
+    cart.splice(position, 1);
+  }
+
+  return cartItem;
+}
 
 /* Create a function named cartTotal that has no parameters
   - cartTotal should iterate through the cart to get the total cost of all products
@@ -143,8 +136,13 @@ function cartTotal() {
 
 /* Create a function called emptyCart that empties the products from the cart */
 function emptyCart() {
+  cart.forEach(function(item) {
+    item.quantity = 0;
+  });
+
   cart.length = 0;
 }
+
 
 /* Create a function named pay that takes in an amount as an argument
   - amount is the money paid by customer
@@ -153,8 +151,32 @@ function emptyCart() {
   Hint: cartTotal function gives us cost of all the products in the cart  
 */
 function pay(amount) {
+  totalPaid += amount;
+
+  const remainingBalance = totalPaid - cartTotal();
+  if (remainingBalance >= 0) {
+    emptyCart();
+    totalPaid = 0;
+  }
+  return remainingBalance;
+}
+
+function getRemainingBalance(amount) {
+
   let total = cartTotal();
   return amount - total;
+}
+
+function getProductById(productId) {
+  return products.find(function(item) {
+    return item.productId === productId;
+  });
+} 
+
+function getCartItem(productId) {
+  return cart.find(function(item) {
+    return item.productId === productId;
+  });
 }
 
 /* Place stand out suggestions here (stand out suggestions can be found at the bottom of the project rubric.)*/
